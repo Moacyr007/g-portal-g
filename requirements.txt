@@ -1,0 +1,3 @@
+neobolt           1.7.9 #neobolt na última versão n está funcionando
+neo4j             1.7.6
+pandas            0.25.3
