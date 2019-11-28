@@ -2,10 +2,6 @@ from neo4j import GraphDatabase
 import pandas as pd 
 from neo4j import GraphDatabase
 
-#cadastro_file = pd.read_csv('201908_Cadastro.csv', sep=';', encoding='cp860')
-
-#print(cadastro_file.head())
-
 class new4jDriver(object):
 
     def __init__(self, uri, user, password):
@@ -57,6 +53,50 @@ class new4jDriver(object):
 
 
 driver = new4jDriver('bolt://localhost:7687',"neo4j", "123456")
-#driverTeste.print_greeting('sad')
-driver.add_licitacao('numero', 'objeto', 'situacao', 'valor', 'data')
+'''
+cnpj_file = pd.read_csv('201908_CNPJ.csv', sep=';', encoding='cp860')
+for index, row in cnpj_file.iterrows():
+    driver.add_empresa(row['RAZAOSOCIAL'], row['NOMEFANTASIA'],row['CNPJ'])
+
+
+cadastro_file = pd.read_csv('201908_Cadastro.csv', sep=';', encoding='cp860')
+for index, row in cadastro_file.iterrows():
+    driver.add_pessoa(row['NOME'], row['CPF'])
+
+licitacao_file = pd.read_csv('201908_Licitaá∆o.csv', sep=';', encoding='cp860')
+for index, row in licitacao_file.iterrows():
+    driver.add_licitacao(row['Número Licitação'], row['Objeto'], row['Situação Licitação'], row['Valor Licitação'], row['Data Resultado Compra'])
+
+for index, row in licitacao_file.iterrows():
+    driver.add_orgao(row['Nome Órgão'], row['Código Órgão'])
+
+compras_file = pd.read_csv('201908_Compras.csv', sep=';', encoding='cp860')
+for index, row in licitacao_file.iterrows():
+    driver.add_contrato(row['Número do Contrato'], row['Objeto'], row['Valor Final Compra'], row['Data Início Vigência'])
+
+'''
+
+cnpj_file = pd.read_csv('201908_CNPJ.csv', sep=';', encoding='cp860')
+for index, row in cnpj_file.head().iterrows():
+    driver.add_empresa(row['RAZAOSOCIAL'], row['NOMEFANTASIA'],row['CNPJ'])
+
+
+cadastro_file = pd.read_csv('201908_Cadastro.csv', sep=';', encoding='cp860')
+for index, row in cadastro_file.head().iterrows():
+    driver.add_pessoa(row['NOME'], row['CPF'])
+
+licitacao_file = pd.read_csv('201908_Licitaá∆o.csv', sep=';', encoding='cp860')
+for index, row in licitacao_file.head().iterrows():
+    driver.add_licitacao(row['Número Licitação'], row['Objeto'], row['Situação Licitação'], row['Valor Licitação'], row['Data Resultado Compra'])
+
+for index, row in licitacao_file.iterrows():
+    driver.add_orgao(row['Nome Órgão'], row['Código Órgão'])
+
+compras_file = pd.read_csv('201908_Compras.csv', sep=';', encoding='cp860')
+for index, row in licitacao_file.head().iterrows():
+    driver.add_contrato(row['Número do Contrato'], row['Objeto'], row['Valor Final Compra'], row['Data Início Vigência'])
+
+
+
+
 
