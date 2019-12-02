@@ -56,8 +56,8 @@ class new4jDriver(object):
 
 driver = new4jDriver('bolt://localhost:7687',"neo4j", "123456")
 
-'''
-#funcionando
+
+#Inserir os nós vvvvvv____________________________________________________________________________________________________________________________
 
 cnpj_file = pd.read_csv('201908_CNPJ.csv', sep=';', encoding='latin1')
 for index, row in cnpj_file.head().iterrows():
@@ -66,38 +66,55 @@ for index, row in cnpj_file.head().iterrows():
 cadastro_file = pd.read_csv('201908_Cadastro.csv', sep=';', encoding='latin1')
 for index, row in cadastro_file.head().iterrows():
     driver.add_pessoa(row['NOME'], row['CPF'])
-'''
+
+licitacao_file = pd.read_csv('201908_Licitaá∆o.csv', sep=';', encoding='latin1', error_bad_lines=False)
+for index, row in licitacao_file.head().iterrows():
+    driver.add_licitacao(row['Número Licitação'], row['Objeto'], row['Situação Licitação'], row['Valor Licitação'], row['Data Resultado Compra'])
+
+# sorting by first name 
+licitacao_file.sort_values("Código Órgão", inplace = True) 
+# dropping ALL duplicte values
+licitacao_file.drop_duplicates(subset ="Código Órgão", keep = 'first', inplace = True)
+
+for index, row in licitacao_file.head().iterrows():
+    driver.add_orgao(row['Nome Órgão'], row['Código Órgão'])
+
+
+compras_file = pd.read_csv('201908_Compras.csv', sep=';', encoding='latin1')
+for index, row in compras_file.head().iterrows():
+    driver.add_contrato(row['Número do Contrato'], row['Objeto'], row['Valor Final Compra'], row['Data Início Vigência'])
+
+
+#Inserir os nós ^^^^^^____________________________________________________________________________________________________________________________
+
+
+
+
 '''
 licitacao_file = pd.read_csv('201908_Licitacao.csv', sep=';', encoding='latin1')
 print('AQUI _________', licitacao_file.columns)
 compras_file = pd.read_csv('201908_Compras.csv', sep=';', encoding='latin1')
 print('AQUI _________', compras_file.columns)
-'''
 
+'''
+'''
 licitacao_file = pd.read_csv('201908_Licitacao.csv', sep=';', encoding='latin1')
 licitacao_list = licitacao_file.values.tolist() 
+'''
 
+'''
+#csv_reader = csv.reader('201908_Licitacao', delimiter=';')
 def dim(a):
     if not type(a) == list:
         return []
     return [len(a)] + dim(a[0])
 
 print(dim(licitacao_list))
-#TODO tentar converter df pra lista ver se consigo inserir
 
-'''   
-licitacao_file = pd.read_csv('201908_Licitacao.csv', sep=';', encoding='latin1')
+print(licitacao_list[1][1])
 
-for index, row in licitacao_file.head().iterrows():
-    driver.add_licitacao(row['Número Licitação'], row['Objeto'], row['Situação Licitação'], row['Valor Licitação'], row['Data Resultado Compra'])
-for index, row in licitacao_file.iterrows():
-    driver.add_orgao(row['Nome Órgão'], row['Código Órgão'])
-
-
-compras_file = pd.read_csv('201908_Compras.csv', sep=';', encoding='latin1')
-for index, row in licitacao_file.head().iterrows():
-    driver.add_contrato(row['Número do Contrato'], row['Objeto'], row['Valor Final Compra'], row['Data Início Vigência'])
-
+for a in range(15):
+    print(licitacao_list[0][a])
 
 '''
 
