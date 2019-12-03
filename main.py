@@ -47,103 +47,67 @@ class new4jDriver(object):
             session.run("CREATE (:Contrato {numero: $numero, objeto: $objeto, valor:$valor, data:$data})", 
             numero=numero, objeto=objeto, valor=valor, data=data)
 
+
+
     #Cadastrar empresa
     def add_empresa(self, nome_social, nome_fantasia, cnpj):
-        with self._driver.session() as session:
-            session.run("CREATE (:Empresa {nome_social: $nome_social, nome_fantasia:$nome_fantasia, cnpj:$cnpj})", 
-            nome_social=nome_social, nome_fantasia=nome_fantasia, cnpj=cnpj)
+        return ("CREATE (:Empresa {nome_social:"+str(nome_social)+", nome_fantasia:"+str(nome_fantasia)+", cnpj:"+str(cnpj)+"})")
 
+    def add_teste(self, aux):
+        with self._driver.session() as session:
+            session.run(aux)
+
+
+
+
+    def add_socio(self, cnpj_empresa, cpj_cnpj_socio, tipo):
+        with self._driver.session() as session:
+            session.run("MATCH (e:Empresa), (es:Empresa) where e.cnpj = $cnpj_empresa and es.cnpj=$cpj_cnpj_socio  CREATE (es)-[:SOCIO {tipo: $tipo}]->(e)",
+            cnpj_empresa=cnpj_empresa, cpj_cnpj_socio=cpj_cnpj_socio, tipo=tipo)
+            
+            session.run("MATCH (e:Empresa), (ps:Pessoa) where e.cnpj = $cnpj_empresa and ps.cnpj=$cpj_cnpj_socio  CREATE (ps)-[:SOCIO {tipo: $tipo}]->(e)",
+            cnpj_empresa=cnpj_empresa, cpj_cnpj_socio=cpj_cnpj_socio, tipo=tipo)
 
 driver = new4jDriver('bolt://localhost:7687',"neo4j", "123456")
 
 
 #Inserir os nós vvvvvv____________________________________________________________________________________________________________________________
 
-cnpj_file = pd.read_csv('201908_CNPJ.csv', sep=';', encoding='latin1')
-for index, row in cnpj_file.head().iterrows():
-    driver.add_empresa(row['RAZAOSOCIAL'], row['NOMEFANTASIA'],row['CNPJ'])
+cnpj_df = pd.read_csv('201908_CNPJ.csv', sep=';', encoding='latin1')
+aux = ""
+for index, row in cnpj_df.iterrows():
+    aux = aux + driver.add_empresa(row['RAZAOSOCIAL'], row['NOMEFANTASIA'],row['CNPJ'])
 
-cadastro_file = pd.read_csv('201908_Cadastro.csv', sep=';', encoding='latin1')
-for index, row in cadastro_file.head().iterrows():
+driver.add_teste(aux)
+'''
+cadastro_df = pd.read_csv('201908_Cadastro.csv', sep=';', encoding='latin1')
+for index, row in cadastro_df.head(50).iterrows():
     driver.add_pessoa(row['NOME'], row['CPF'])
 
-licitacao_file = pd.read_csv('201908_Licitaá∆o.csv', sep=';', encoding='latin1', error_bad_lines=False)
-for index, row in licitacao_file.head().iterrows():
+licitacao_df = pd.read_csv('201908_Licitaá∆o.csv', sep=';', encoding='latin1', error_bad_lines=False)
+for index, row in licitacao_df.head(50).iterrows():
     driver.add_licitacao(row['Número Licitação'], row['Objeto'], row['Situação Licitação'], row['Valor Licitação'], row['Data Resultado Compra'])
 
-# sorting by first name 
-licitacao_file.sort_values("Código Órgão", inplace = True) 
-# dropping ALL duplicte values
-licitacao_file.drop_duplicates(subset ="Código Órgão", keep = 'first', inplace = True)
+#Remover Orgãos duplicados
+licitacao_df.sort_values("Código Órgão", inplace = True)
+licitacao_df.drop_duplicates(subset ="Código Órgão", keep = 'first', inplace = True) # dropping ALL duplicte values
 
-for index, row in licitacao_file.head().iterrows():
+for index, row in licitacao_df.head(50).iterrows():
     driver.add_orgao(row['Nome Órgão'], row['Código Órgão'])
 
 
-compras_file = pd.read_csv('201908_Compras.csv', sep=';', encoding='latin1')
-for index, row in compras_file.head().iterrows():
+compras_df = pd.read_csv('201908_Compras.csv', sep=';', encoding='latin1')
+for index, row in compras_df.head(50).iterrows():
     driver.add_contrato(row['Número do Contrato'], row['Objeto'], row['Valor Final Compra'], row['Data Início Vigência'])
-
-
+'''
 #Inserir os nós ^^^^^^____________________________________________________________________________________________________________________________
 
+#Inserir as relações vvvvvv____________________________________________________________________________________________________________________________
+socios_df = pd.read_csv('201908_Socios.csv', sep=';', encoding='latin1', error_bad_lines=False)
+for index, row in socios_df.head(50).iterrows():
+    driver.add_socio(row['CNPJ'], row['CPF-CNPJ'], row['Tipo'])
 
 
 
-'''
-licitacao_file = pd.read_csv('201908_Licitacao.csv', sep=';', encoding='latin1')
-print('AQUI _________', licitacao_file.columns)
-compras_file = pd.read_csv('201908_Compras.csv', sep=';', encoding='latin1')
-print('AQUI _________', compras_file.columns)
 
-'''
-'''
-licitacao_file = pd.read_csv('201908_Licitacao.csv', sep=';', encoding='latin1')
-licitacao_list = licitacao_file.values.tolist() 
-'''
-
-'''
-#csv_reader = csv.reader('201908_Licitacao', delimiter=';')
-def dim(a):
-    if not type(a) == list:
-        return []
-    return [len(a)] + dim(a[0])
-
-print(dim(licitacao_list))
-
-print(licitacao_list[1][1])
-
-for a in range(15):
-    print(licitacao_list[0][a])
-
-'''
-
-
-'''
-cnpj_file = pd.read_csv('201908_CNPJ.csv', sep=';', encoding='1252')
-for index, row in cnpj_file.iterrows():
-    driver.add_empresa(row['RAZAOSOCIAL'], row['NOMEFANTASIA'],row['CNPJ'])
-
-
-cadastro_file = pd.read_csv('201908_Cadastro.csv', sep=';', encoding='1252')
-for index, row in cadastro_file.iterrows():
-    driver.add_pessoa(row['NOME'], row['CPF'])
-
-licitacao_file = pd.read_csv('201908_Licitaá∆o.csv', sep=';', encoding='1252')
-for index, row in licitacao_file.iterrows():
-    driver.add_licitacao(row['Número Licitação'], row['Objeto'], row['Situação Licitação'], row['Valor Licitação'], row['Data Resultado Compra'])
-
-for index, row in licitacao_file.iterrows():
-    driver.add_orgao(row['Nome Órgão'], row['Código Órgão'])
-
-compras_file = pd.read_csv('201908_Compras.csv', sep=';', encoding='1252')
-for index, row in licitacao_file.iterrows():
-    driver.add_contrato(row['Número do Contrato'], row['Objeto'], row['Valor Final Compra'], row['Data Início Vigência'])
-'''
-'''
-with open('201908_CNPJ.csv') as csvfile:
-    readCSV = csv.reader(csvfile, delimiter=';', encoding='1252')
-    for row in readCSV:
-        print(row) 
-'''
-
+#Inserir as relações ^^^^^^____________________________________________________________________________________________________________________________
