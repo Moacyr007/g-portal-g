@@ -30,16 +30,24 @@ class new4jDriver(object):
         with self._driver.session() as session:
             session.run("CREATE (a:Pessoa {nome: $nome, cpf: $cpf})", nome=nome, cpf=cpf)
     
+    def gerar_script_add_pessoa(self, nome, cpf):
+        return ("CREATE (:Pessoa {nome:"+str(nome)+", cpf:"+str(cpf)+"})")
+    
     #Cadastrar orgao
     def add_orgao(self, nome, codigo):
         with self._driver.session() as session:
             session.run("CREATE (a:Orgao {nome: $nome, codigo: $codigo})", nome=nome, codigo=codigo)
+    def gerar_script_add_orgao(self, nome, codigo):
+        return ("CREATE (:Orgao {nome:"+str(nome)+", codigo:"+str(codigo)+"})")
             
     #Cadastrar pessoa
     def add_licitacao(self, numero, objeto, situacao, valor, data):
         with self._driver.session() as session:
             session.run("CREATE (:Licitacao {numero: $numero, objeto: $objeto, situacao:$situacao, valor:$valor, data:$data})", 
             numero=numero, objeto=objeto, situacao=situacao, valor=valor, data=data)
+    
+    def gerar_script_add_licitacao(self, numero, objeto, situacao, valor, data):
+        return ("CREATE (:Licitacao {numero:"+str(numero)+", objeto:"+str(objeto)+", situacao:"+str(situacao)+", valor:"+str(valor)+", data:"+str(data)+"})")
 
     #Cadastrar contrato
     def add_contrato(self, numero, objeto, valor, data):
@@ -47,15 +55,19 @@ class new4jDriver(object):
             session.run("CREATE (:Contrato {numero: $numero, objeto: $objeto, valor:$valor, data:$data})", 
             numero=numero, objeto=objeto, valor=valor, data=data)
 
+    def gerar_script_add_contrato(self, numero, objeto, valor, data):
+        return ("CREATE (:Contrato {numero:"+str(numero)+", objeto:"+str(objeto)+", valor:"+str(valor)+", data:"+str(data)+"})")
+
 
 
     #Cadastrar empresa
-    def add_empresa(self, nome_social, nome_fantasia, cnpj):
+    def gerar_script_add_empresa(self, nome_social, nome_fantasia, cnpj):
         return ("CREATE (:Empresa {nome_social:"+str(nome_social)+", nome_fantasia:"+str(nome_fantasia)+", cnpj:"+str(cnpj)+"})")
 
-    def add_teste(self, aux):
+
+    def rodar_no_neo4j(self, script):
         with self._driver.session() as session:
-            session.run(aux)
+            session.run(script)
 
 
 
@@ -76,9 +88,9 @@ driver = new4jDriver('bolt://localhost:7687',"neo4j", "123456")
 cnpj_df = pd.read_csv('201908_CNPJ.csv', sep=';', encoding='latin1')
 aux = ""
 for index, row in cnpj_df.iterrows():
-    aux = aux + driver.add_empresa(row['RAZAOSOCIAL'], row['NOMEFANTASIA'],row['CNPJ'])
+    aux = aux + driver.gerar_script_add_empresa(row['RAZAOSOCIAL'], row['NOMEFANTASIA'],row['CNPJ'])
 
-driver.add_teste(aux)
+driver.rodar_no_neo4j(aux)
 '''
 cadastro_df = pd.read_csv('201908_Cadastro.csv', sep=';', encoding='latin1')
 for index, row in cadastro_df.head(50).iterrows():
