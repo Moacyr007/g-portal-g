@@ -92,6 +92,7 @@ for index, row in cnpj_df.iterrows():
     if (count == 1000):
         driver.rodar_no_neo4j(script)
         script = ""
+        count = 0
     script = script + driver.gerar_script_add_empresa(row['RAZAOSOCIAL'], row['NOMEFANTASIA'],row['CNPJ'])
     count += count
 
