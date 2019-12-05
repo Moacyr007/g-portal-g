@@ -86,11 +86,16 @@ driver = new4jDriver('bolt://localhost:7687',"neo4j", "123456")
 #Inserir os nós vvvvvv____________________________________________________________________________________________________________________________
 
 cnpj_df = pd.read_csv('201908_CNPJ.csv', sep=';', encoding='latin1')
-aux = ""
+script = ""
+count = 0
 for index, row in cnpj_df.iterrows():
-    aux = aux + driver.gerar_script_add_empresa(row['RAZAOSOCIAL'], row['NOMEFANTASIA'],row['CNPJ'])
+    if (count == 1000):
+        driver.rodar_no_neo4j(script)
+        script = ""
+    script = script + driver.gerar_script_add_empresa(row['RAZAOSOCIAL'], row['NOMEFANTASIA'],row['CNPJ'])
+    count += count
 
-driver.rodar_no_neo4j(aux)
+driver.rodar_no_neo4j(script)
 '''
 cadastro_df = pd.read_csv('201908_Cadastro.csv', sep=';', encoding='latin1')
 for index, row in cadastro_df.head(50).iterrows():
