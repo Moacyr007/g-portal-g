@@ -83,7 +83,7 @@ class new4jDriver(object):
 driver = new4jDriver('bolt://localhost:7687',"neo4j", "123456")
 
 
-#Inserir os nós vvvvvv____________________________________________________________________________________________________________________________
+#Inserir os nós
 
 cnpj_df = pd.read_csv('201908_CNPJ.csv', sep=';', encoding='latin1')
 script = ""
@@ -118,9 +118,9 @@ compras_df = pd.read_csv('201908_Compras.csv', sep=';', encoding='latin1')
 for index, row in compras_df.head(50).iterrows():
     driver.add_contrato(row['Número do Contrato'], row['Objeto'], row['Valor Final Compra'], row['Data Início Vigência'])
 '''
-#Inserir os nós ^^^^^^____________________________________________________________________________________________________________________________
 
-#Inserir as relações vvvvvv____________________________________________________________________________________________________________________________
+
+#Inserir as relações
 socios_df = pd.read_csv('201908_Socios.csv', sep=';', encoding='latin1', error_bad_lines=False)
 for index, row in socios_df.head(50).iterrows():
     driver.add_socio(row['CNPJ'], row['CPF-CNPJ'], row['Tipo'])
